@@ -147,16 +147,16 @@ jmp main
 main:   mov ah, 00h
         int 16h
                         
-        cmp al, 110     ;Compara que tecla se presiono, si es 'n'    
+        cmp al, 73h     ;Compara que tecla se presiono, si es 's'    
         je Down
                 
-        cmp al, 121     ;Compara que tecla se presiono, si es 'y'    
+        cmp al, 77h     ;Compara que tecla se presiono, si es 'w'    
         je Up
                 
-        cmp al, 103     ;Compara que tecla se presiono, si es 'g'    
+        cmp al, 61h     ;Compara que tecla se presiono, si es 'a'    
         je Left
                 
-        cmp al, 106     ;Compara que tecla se presiono, si es 'j'    
+        cmp al, 64h     ;Compara que tecla se presiono, si es 'd'    
         je Right
                 
        
