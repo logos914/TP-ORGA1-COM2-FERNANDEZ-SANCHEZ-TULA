@@ -58,18 +58,12 @@ botes_Jug2 db "**##***********"
 
 
 
-   ESTO LO CAM BIO A PRPOERPANFSDG
-   SDGF
-   SDFG
-   EAYERG
-   SG
-   BGA
-   GERAG
-   ERGEA
+
 
 
                                                                 
 
+; ACA EL PROGRAMA
 
 
 
@@ -79,7 +73,7 @@ mov dx, OFFSET presentacionArte
 mov ah,9
 int 21h       
 
-mov dh, 9
+mov dh, 90
 mov dl, 0
 mov ah, 02h
 mov bh, 00
