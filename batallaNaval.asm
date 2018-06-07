@@ -58,12 +58,18 @@ botes_Jug2 db "**##***********"
 
 
 
-
+   ESTO LO CAM BIO A PRPOERPANFSDG
+   SDGF
+   SDFG
+   EAYERG
+   SG
+   BGA
+   GERAG
+   ERGEA
 
 
                                                                 
 
-; ACA EL PROGRAMA
 
 
 
