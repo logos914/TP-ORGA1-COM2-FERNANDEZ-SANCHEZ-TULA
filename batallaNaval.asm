@@ -56,7 +56,7 @@ botes_Jug2 db "**##***********"
            db "#******#*******" 
            db "#******#*******" 
 
-
+filas db 7
 
 
 
@@ -69,16 +69,78 @@ botes_Jug2 db "**##***********"
 
 
 inicio:
-mov dx, OFFSET presentacionArte
+; Pintar de cyan el encabezado ASCII   
+mov ah, 09h
+mov al, [presentacionArte]
+mov bh, 0
+mov bl, 1011b
+mov cx, 480
+int 10h       
+         
+; mover cursor donde estaria el titulo del tablero    
+mov dh, 8
+mov dl, 0
+mov bh, 0
+mov ah, 2
+int 10h
+
+; pintar de verde el titulo del tablero     
+mov ah, 09h
+mov al, [titulo]
+mov bh, 0
+mov bl, 1010b
+mov cx, 80
+mov dh, 7
+mov dl, 9
+int 10h     
+
+
+; mover cursor donde estaria el el mar    
+mov dh, 9
+mov dl, 0
+mov bh, 0
+mov ah, 2
+int 10h
+
+
+; pintar de azul el mar 
+mov ah, 09h
+mov al, 0
+mov bh, 0
+mov bl, 1001b
+mov cx, 880
+mov dh, filas
+mov dl, 0
+int 10h
+
+
+;mover cursor al cero para escribir caracteres 
+mov dh, 0
+mov dl, 0
+mov bh, 0
+mov ah, 2
+int 10h
+	
+
+; Mostrar el tablero	
+mov dx, OFFSET presentacionArte  
+mov bh, 0
+mov bl, 03h
 mov ah,9
 int 21h       
 
-mov dh, 90
-mov dl, 0
+
+mov dh, 9
+mov dl, 0 
 mov ah, 02h
-mov bh, 00
-int 10h  
+int 10h
   
+mov dh, 9
+mov dl, 0        
+mov ah, 1
+int 10h 
+       
+        
 
 jmp main
 
@@ -136,4 +198,6 @@ SetCursor proc
         int 10h             ;Analizar esta int, que es la que posiciona el cursor
         ret
 
-SetCursor endp      
+SetCursor endp
+
+
