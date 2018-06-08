@@ -254,18 +254,18 @@ DisparoJugador1:
             
 DeteccionDerechaJug2:
         mov ComparaPosicion, dl
-        sub ComparaPosicion, 31 ; No puede ir a derecha de la columna 14
-        JS MoverDerecha         ; si la diferencia es negativa, se puede mover a derecha
+        sub ComparaPosicion, 31         ; No puede ir a derecha de la columna 31
+        JS MoverDerecha                 ; si la diferencia es negativa, se puede mover a derecha
         jmp mueveJug2
         ret            
             
             
 
 DeteccionIzquierdaJug2:
-        mov ComparaPosicion, dl
-        sub ComparaPosicion, 11               ; No puede ir a izquierda si ya esta en columna 0
-        jns mueveJug2            ; si son iguales, volver al loop
-        jmp MoverIzquierda      ; si no son iguales, permite el movimiento
+        mov ComparaPosicion, dl         ; No puede ir a izquierda si ya esta en columna 17
+        sub ComparaPosicion, 17
+        je  mueveJug2                    ; si son iguales, volver al loop
+        jmp MoverIzquierda               ; si no son iguales, permite el movimiento
         ret   
         
                 
