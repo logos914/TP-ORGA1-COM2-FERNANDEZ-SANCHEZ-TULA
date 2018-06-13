@@ -15,20 +15,20 @@ db                  " ==========================================================
 
 
   titulo db " Mar jugador 1 || Mar jugador 2 ", 10,13
-matriz01 db "***************||***************", 10,13
-matriz02 db "***************||***************", 10,13
-matriz03 db "***************||***************", 10,13
-matriz04 db "***************||***************", 10,13
-matriz05 db "***************||***************", 10,13
-matriz06 db "***************||***************", 10,13
-matriz07 db "***************||***************", 10,13
-matriz08 db "***************||***************", 10,13
-matriz09 db "***************||***************", 10,13
-matriz10 db "***************||***************", 10,13
-matriz11 db "***************||***************", 10,13
-tablero  db "Puntaje:       ||Puntaje:      $", 10,13 
-exitoso   db 73h, "$" 
-fracasoso db 6Eh, "$" 
+tablero  db "***************||***************", 10,13
+         db "***************||***************", 10,13
+         db "***************||***************", 10,13
+         db "***************||***************", 10,13
+         db "***************||***************", 10,13
+         db "***************||***************", 10,13
+         db "***************||***************", 10,13
+         db "***************||***************", 10,13
+         db "***************||***************", 10,13
+         db "***************||***************", 10,13
+         db "***************||***************", 10,13
+puntaje  db "Puntaje:       ||Puntaje:      $", 10,13 
+exitoso   db 53h, "$" 
+fracasoso db 4Eh, "$" 
 
 
 botes_Jug1 db "**######*******" 
@@ -59,7 +59,9 @@ botes_Jug2 db "**##***********"
 filas db 7
 ComparaPosicion db 0
 MueveJugador db 0
-
+conversorH dw 0000
+conversorL db 0000
+barquito db "#"
 
 
 
@@ -243,8 +245,80 @@ DetectarAbajoJug1:
         jmp mueveJug1
         ret
         
-DisparoJugador1:
-        jmp FinDeTurno   
+DisparoJugador1: 
+
+        mov ax, 0
+        
+        mov al, 15
+        sub dh,9
+        mul dh
+        add dh,9
+       
+       
+        mov bl, dl
+        mov bh,0      
+        add ax, bx
+        
+        mov bx,0
+        
+        
+        MOV di,ax
+        mov al, botes_Jug1[di]
+        
+        cmp al , barquito 
+        je  acertar
+        jmp errar 
+
+
+        
+DisparoJugador2: 
+
+        mov ax, 0
+        
+        mov al, 15
+        sub dh,9
+        mul dh
+        add dh,9
+       
+       
+        mov bl, dl
+        sub bl, 17
+        mov bh,0      
+        add ax, bx
+        
+        mov bx,0
+        
+        
+        MOV di,ax
+        mov al, botes_Jug2[di]
+        
+        cmp al , barquito 
+        je  acertar
+        jmp errar
+
+       
+       
+acertar:
+; pintar de amarillo el impacto en el mar 
+mov ah, 09h
+mov al, exitoso
+mov bh, 0
+mov bl, 1100b
+mov cx, 1
+int 10h
+jmp FinDeTurno  
+
+
+errar:
+; pintar de rojo el fallido en el mar 
+mov ah, 09h
+mov al, fracasoso
+mov bh, 0
+mov bl, 0111b
+mov cx, 1
+int 10h
+jmp FinDeTurno       
+    
 
 
 
@@ -290,8 +364,7 @@ DetectarAbajoJug2:
         jmp mueveJug2
         ret   
 
-DisparoJugador2:
-        jmp FinDeTurno
+
 
 
 
