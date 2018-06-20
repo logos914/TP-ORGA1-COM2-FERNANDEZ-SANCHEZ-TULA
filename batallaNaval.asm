@@ -75,9 +75,9 @@ barquito db "#"
 inicio:
 ; Pintar de cyan el encabezado ASCII   
 mov ah, 09h
-mov al, [presentacionArte]
+mov al, 00h
 mov bh, 0
-mov bl, 1011b
+mov bl, 1011b 
 mov cx, 480
 int 10h       
          
@@ -90,7 +90,7 @@ int 10h
 
 ; pintar de verde el titulo del tablero     
 mov ah, 09h
-mov al, [titulo]
+mov al, 00h
 mov bh, 0
 mov bl, 1010b
 mov cx, 80
@@ -244,6 +244,8 @@ DetectarAbajoJug1:
         JS MoverAbajo
         jmp mueveJug1
         ret
+
+
         
 DisparoJugador1: 
 
@@ -329,7 +331,7 @@ jmp FinDeTurno
 DeteccionDerechaJug2:
         mov ComparaPosicion, dl
         sub ComparaPosicion, 31         ; No puede ir a derecha de la columna 31
-        JS MoverDerecha                 ; si la diferencia es negativa, se puede mover a derecha
+        js  MoverDerecha                ; si la diferencia es negativa, se puede mover a derecha
         jmp mueveJug2
         ret            
             
@@ -344,19 +346,15 @@ DeteccionIzquierdaJug2:
         
                 
         
-
 DetectarArribaJug2:
         mov ComparaPosicion, dh    ; No puede ir hacia arriba si ya esta en fila 10 (0A)
         sub ComparaPosicion, 10    ; Si la resta es positiva permite subir
         JNS MoverArriba
         jmp mueveJug2
         ret              
-             
-            
-        
-        
-
-
+       
+       
+       
 DetectarAbajoJug2:
         mov ComparaPosicion, dh    ; No puede ir hacia abajo si ya esta en fila 19 (0A)
         sub ComparaPosicion, 19    ; Si la resta es negativa permite bajar
@@ -411,37 +409,36 @@ SetCursor endp
 
 
 
-; Subrutinas de cambio de turno
+; Subrutinas de turnos de jugadores
 
-SigueMoviendo:
-    cmp MueveJugador,0
+SigueMoviendo:          ; En el caso de que el movimiento finalizo 
+    cmp MueveJugador,0  ; o es invalido pero continua el turno en el jugador actual
     je  mueveJug1
     jmp mueveJug2
     ret
 
 
 FinDeTurno:
-    cmp MueveJugador,0
-    je  AhoraMueveJugador2
+    cmp MueveJugador,0     ; En el caso de que el movimiento finalizo
+    je  AhoraMueveJugador2 ; y con ello tambien el turno del jugador actual
     jmp AhoraMueveJugador1
     ret
 
 
-AhoraMueveJugador1:
-
+AhoraMueveJugador1:         ;Realiza las acciones para el comienzo del turno del jugador 1
     mov MueveJugador,0
-    mov dh, 9     ; Ubicar cursor en posicion 0,0 de su matriz
-    mov dl, 0        
+    mov dh, 14     ; Ubicar cursor en posicion 0,0 de su matriz         !QUE MIERDA QUISE DECIR EN EL COMENT?
+    mov dl, 7        
     mov ah, 02h
     int 10h 
     jmp mueveJug1
     ret
     
 
-AhoraMueveJugador2:
+AhoraMueveJugador2:         ;Realiza las acciones para el comienzo del turno del jugador 2
     mov MueveJugador,1
-    mov dh, 9     ; Ubicar cursor en posicion 0,11 de su matriz
-    mov dl, 17        
+    mov dh, 14     ; Ubicar cursor en posicion 0,11 de su matriz        !QUE MIERDA QUISE DECIR EN EL COMENT?
+    mov dl, 24        
     mov ah, 02h
     int 10h
     jmp mueveJug2
