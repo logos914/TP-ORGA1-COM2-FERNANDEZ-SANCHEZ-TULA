@@ -57,7 +57,6 @@ botes_Jug2 db "**##***********"
            db "#******#*******" 
            db "#******#*******" 
 
-filas db 7
 ComparaPosicion db 0
 MueveJugador db 0
 
@@ -72,7 +71,7 @@ MueveJugador db 0
 
 
 inicio:
-; Pintar de cyan el encabezado ASCII   
+; Pintar de cyan usando un carac NULL los espacios que ocuparia el encabezado ASCII   
 mov ah, 09h
 mov al, 00h
 mov bh, 0
@@ -87,7 +86,7 @@ mov bh, 0
 mov ah, 2
 int 10h
 
-; pintar de verde el titulo del tablero     
+; pintar de verde usando un carac NULL los espacios que ocuparia el titulo del tablero     
 mov ah, 09h
 mov al, 00h
 mov bh, 0
@@ -98,7 +97,7 @@ mov dl, 9
 int 10h     
 
 
-; mover cursor donde estaria el el mar    
+; mover cursor donde estaria el mar    
 mov dh, 9
 mov dl, 0
 mov bh, 0
@@ -106,18 +105,18 @@ mov ah, 2
 int 10h
 
 
-; pintar de azul el mar 
+; pintar de azul usando un carac NULL los espacios que ocuparia el mar 
 mov ah, 09h
 mov al, 0
 mov bh, 0
 mov bl, 1001b
 mov cx, 880
-mov dh, filas
+mov dh, 7
 mov dl, 0
 int 10h
 
 
-;mover cursor al cero para escribir caracteres 
+;mover cursor al cero para escribir caracteres que necesitamos que sean visibles
 mov dh, 0
 mov dl, 0
 mov bh, 0
@@ -125,7 +124,7 @@ mov ah, 2
 int 10h
 	
 
-; Mostrar el tablero	
+; Mostrar el arte ascii, el titulo y el tablero completo	
 mov dx, offset[presentacionArte]  
 mov bh, 0
 mov bl, 03h
@@ -135,11 +134,12 @@ int 21h
 
 mov dh, 14   
 mov dl, 7       
-mov ah, 02h
-int 10h
-  
-mov dh, 14     
-mov dl, 7             
+call setCursor 
+
+;Hacer que el cursor parpadee en la posicion en la que se encuentre
+mov ch, 0
+mov cl, 7 
+mov bl, 1010b           
 mov ah, 1
 int 10h 
        
@@ -148,12 +148,14 @@ int 10h
 jmp mueveJug1
 
 
+
+
 ; ESTE LOOP ESCUCHA QUE TECLA PRESIONA EL JUGADOR 1
 mueveJug1:   
         mov ah, 00h
         int 16h
                         
-        cmp al, 78h     ;Compara que tecla se presiono, si es 's'    
+        cmp al, 78h     ;Compara que tecla se presiono, si es 'x'    
         je DetectarAbajoJug1
                 
         cmp al, 77h     ;Compara que tecla se presiono, si es 'w'    
@@ -203,10 +205,7 @@ mueveJug2:
  
 
 
-; CALCULA QUE MOVIMIENTOS SON POSIBLE PARA EL JUGADOR1
-
-   
-            
+; CALCULADORA DE QUE MOVIMIENTOS SON POSIBLE PARA EL JUGADOR1       
 DeteccionDerechaJug1:
         mov ComparaPosicion, dl
         sub ComparaPosicion, 14 ; No puede ir a derecha de la columna 14
@@ -221,22 +220,18 @@ DeteccionIzquierdaJug1:
         je mueveJug1            ; si son iguales, volver al loop
         jmp MoverIzquierda      ; si no son iguales, permite el movimiento
         ret   
-        
-                
-        
-
+    
+    
+    
 DetectarArribaJug1:
         mov ComparaPosicion, dh    ; No puede ir hacia arriba si ya esta en fila 10 (0A)
         sub ComparaPosicion, 10    ; Si la resta es positiva permite subir
         JNS MoverArriba
         jmp mueveJug1
         ret              
-             
-            
-        
-        
 
-
+ 
+ 
 DetectarAbajoJug1:
         mov ComparaPosicion, dh    ; No puede ir hacia abajo si ya esta en fila 19 (0A)
         sub ComparaPosicion, 19    ; Si la resta es negativa permite bajar
@@ -245,91 +240,10 @@ DetectarAbajoJug1:
         ret
 
 
-        
-DisparoJugador1: 
-
-        mov ax, 0
-        
-        mov al, 15
-        sub dh,9
-        mul dh
-        add dh,9
-       
-       
-        mov bl, dl
-        mov bh,0      
-        add ax, bx
-        
-        mov bx,0
-        
-        
-        MOV di,ax
-        mov al, botes_Jug1[di]
-        
-        cmp al , barquito 
-        je  acertar
-        jmp errar 
-
-
-        
-DisparoJugador2: 
-
-        mov ax, 0
-        
-        mov al, 15
-        sub dh,9
-        mul dh
-        add dh,9
-       
-       
-        mov bl, dl
-        sub bl, 17
-        mov bh,0      
-        add ax, bx
-        
-        mov bx,0
-        
-        
-        MOV di,ax
-        mov al, botes_Jug2[di]
-        
-        cmp al , barquito 
-        je  acertar
-        jmp errar
-
-       
-       
-acertar:
-; pintar de amarillo el impacto en el mar 
-mov al, exitoso
-mov bl, 1100b
-call pintarDisparo
-jmp FinDeTurno  
-
-
-errar:
-; pintar de rojo el fallido en el mar 
-mov al, fracasoso
-mov bl, 0111b
-call pintarDisparo
-jmp FinDeTurno       
-    
-
-pintarDisparo PROC near ; pintar el disparo en el mar
-mov ah, 09h
-mov bh, 0
-mov cx, 1
-int 10h
-ret
-pintarDisparo endp
-
-
-
-
-; CALCULA QUE MOVIMIENTOS SON POSIBLE PARA EL JUGADOR2
-
-   
             
+            
+            
+; CALCULA QUE MOVIMIENTOS SON POSIBLE PARA EL JUGADOR2      
 DeteccionDerechaJug2:
         mov ComparaPosicion, dl
         sub ComparaPosicion, 31         ; No puede ir a derecha de la columna 31
@@ -362,7 +276,94 @@ DetectarAbajoJug2:
         sub ComparaPosicion, 19    ; Si la resta es negativa permite bajar
         JS MoverAbajo
         jmp mueveJug2
-        ret   
+        ret
+
+
+
+
+; DISPARO DEL JUGADOR 1 (ES UNA COMPARACION DE CARAC, QUE DETERMINA EL EXITO O EL FRACASO DEL DISPARO)
+DisparoJugador1: 
+
+        mov ax, 0
+        
+        mov al, 15
+        sub dh,9
+        mul dh
+        add dh,9
+       
+       
+        mov bl, dl
+        mov bh,0      
+        add ax, bx
+        
+        mov bx,0
+        
+        
+        MOV di,ax
+        mov al, botes_Jug1[di]
+        
+        cmp al , barquito 
+        je  acertar
+        jmp errar 
+
+        
+        
+; DISPARO DEL JUGADOR 2 (ES UNA COMPARACION DE CARAC, QUE DETERMINA EL EXITO O EL FRACASO DEL DISPARO)        
+DisparoJugador2: 
+
+        mov ax, 0
+        
+        mov al, 15
+        sub dh,9
+        mul dh
+        add dh,9
+       
+       
+        mov bl, dl
+        sub bl, 17
+        mov bh,0      
+        add ax, bx
+        
+        mov bx,0
+        
+        
+        MOV di,ax
+        mov al, botes_Jug2[di]
+        
+        cmp al , barquito 
+        je  acertar
+        jmp errar
+
+       
+       
+
+; APARTADO GRAFICO DEL DISPARO (CAMBIA EL CARAC EN PANTALLA Y SOLICITA EL FINAL DEL TURNO)
+acertar:                ; pintar de amarillo el impacto en el marP
+mov al, exitoso
+mov bl, 1100b
+call pintarDisparo
+jmp FinDeTurno  
+
+
+errar:                  ; pintar de rojo el fallido en el mar 
+mov al, fracasoso
+mov bl, 0111b
+call pintarDisparo
+jmp FinDeTurno       
+    
+
+pintarDisparo PROC near ; pintar el disparo en el mar
+mov ah, 09h
+mov bh, 0
+mov cx, 1
+int 10h
+ret
+pintarDisparo endp
+
+
+
+
+   
 
 
 
@@ -429,19 +430,17 @@ FinDeTurno:
 
 AhoraMueveJugador1:         ;Realiza las acciones para el comienzo del turno del jugador 1
     mov MueveJugador,0
-    mov dh, 14     ; Ubicar cursor en posicion 0,0 de su matriz         !QUE MIERDA QUISE DECIR EN EL COMENT?
+    mov dh, 14     
     mov dl, 7        
-    mov ah, 02h
-    int 10h 
+    call SetCursor
     jmp mueveJug1
     ret
     
 
 AhoraMueveJugador2:         ;Realiza las acciones para el comienzo del turno del jugador 2
     mov MueveJugador,1
-    mov dh, 14     ; Ubicar cursor en posicion 0,11 de su matriz        !QUE MIERDA QUISE DECIR EN EL COMENT?
+    mov dh, 14     
     mov dl, 24        
-    mov ah, 02h
-    int 10h
+    call SetCursor
     jmp mueveJug2
     ret
