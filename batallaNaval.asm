@@ -27,9 +27,10 @@ tablero  db "***************||***************", 10,13
          db "***************||***************", 10,13
          db "***************||***************", 10,13
 puntaje  db "Puntaje:       ||Puntaje:      $", 10,13 
-exitoso   db 53h, "$" 
-fracasoso db 4Eh, "$" 
 
+exitoso   db 53h  ; Caracteres que representa el exito   "S"
+fracasoso db 4Eh  ; Caracteres que representa el fracaso "N"
+barquito db "#"   ; Caracteres que un fragmento de barco "#"
 
 botes_Jug1 db "**######*******" 
            db "***************" 
@@ -59,9 +60,7 @@ botes_Jug2 db "**##***********"
 filas db 7
 ComparaPosicion db 0
 MueveJugador db 0
-conversorH dw 0000
-conversorL db 0000
-barquito db "#"
+
 
 
 
@@ -127,20 +126,20 @@ int 10h
 	
 
 ; Mostrar el tablero	
-mov dx, OFFSET presentacionArte  
+mov dx, offset[presentacionArte]  
 mov bh, 0
 mov bl, 03h
 mov ah,9
 int 21h       
 
 
-mov dh, 9
-mov dl, 0 
+mov dh, 14   
+mov dl, 7       
 mov ah, 02h
 int 10h
   
-mov dh, 9
-mov dl, 0        
+mov dh, 14     
+mov dl, 7             
 mov ah, 1
 int 10h 
        
@@ -177,7 +176,7 @@ mueveJug1:
  
  
  ; ESTE LOOP ESCUCHA QUE TECLA PRESIONA EL JUGADOR 2   
- ; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CAMBIAR LAS SUB DE ESTE
+
 mueveJug2:   
         mov ah, 00h
         int 16h
@@ -302,25 +301,28 @@ DisparoJugador2:
        
 acertar:
 ; pintar de amarillo el impacto en el mar 
-mov ah, 09h
 mov al, exitoso
-mov bh, 0
 mov bl, 1100b
-mov cx, 1
-int 10h
+call pintarDisparo
 jmp FinDeTurno  
 
 
 errar:
 ; pintar de rojo el fallido en el mar 
-mov ah, 09h
 mov al, fracasoso
-mov bh, 0
 mov bl, 0111b
-mov cx, 1
-int 10h
+call pintarDisparo
 jmp FinDeTurno       
     
+
+pintarDisparo PROC near ; pintar el disparo en el mar
+mov ah, 09h
+mov bh, 0
+mov cx, 1
+int 10h
+ret
+pintarDisparo endp
+
 
 
 
