@@ -33,11 +33,14 @@ fracasoso db 4Eh  ; Caracteres que representa el fracaso "N"
 barquito db "#"   ; Caracteres que un fragmento de barco "#" 
 
 ComparaPosicion db 0
-MueveJugador db 0
+
 
 PuntajeJugador1 db "00$"
 PuntajeJugador2 db "00$"
 
+MensajeVictoriaCadena db "Ha ganado el jugador $"
+Jugando db 1
+MueveJugador db 0
 
 
 botes_Jug1 db "**######*******" 
@@ -472,9 +475,15 @@ SigueMoviendo:          ; En el caso de que el movimiento finalizo
 
 FinDeTurno:
     call CalcularPuntaje
+    
+    cmp Jugando,0
+    je terminarJuego
+    
     cmp MueveJugador,0     ; En el caso de que el movimiento finalizo
     je  AhoraMueveJugador2 ; y con ello tambien el turno del jugador actual
     jmp AhoraMueveJugador1
+    
+    terminarJuego:
     ret
 
 
@@ -518,11 +527,42 @@ AgregarPuntaje proc
     mul dh
     mov dh,0
     add ax,dx
+    
+    cmp ax,9
+    je pasarAdiez1
+    
+    cmp ax,19
+    je pasarAveinte1
+    
     inc ax
     
-    add ah,30h
-    add al,30h
+    mov ah,offset[PuntajeJugador1+0]
+        cmp al,10
+    ja restarDiez1
+    jmp continuarNoCambiaDecena1                
+                 
+    restarDIez1:
+    sub al,10
     
+    continuarNoCambiaDecena1:               
+    add al,30h
+    jmp escribirPuntosEnMem1
+    
+    pasarAdiez1:
+    mov ah,31h
+    mov al,30h
+    jmp escribirPuntosEnMem1
+    
+    pasarAveinte1:
+    call MensajeVictoria
+    mov ah,32h
+    mov al,30h
+    jmp escribirPuntosEnMem1
+    
+    
+    
+    
+    escribirPuntosEnMem1:
     mov offset[PuntajeJugador1+0],ah
     mov offset[PuntajeJugador1+1],al
     jmp finalAgregarPuntaje
@@ -543,11 +583,42 @@ AgregarPuntaje proc
     mul dh
     mov dh,0
     add ax,dx
+    
+    cmp ax,9
+    je pasarAdiez2
+    
+    cmp ax,19
+    je pasarAveinte2
+    
     inc ax
     
-    add ah,30h
-    add al,30h
+    mov ah,offset[PuntajeJugador2+0]
     
+    cmp al,10
+    ja restarDiez2
+    jmp continuarNoCambiaDecena2                
+                 
+    restarDIez2:
+    sub al,10
+    
+    continuarNoCambiaDecena2:               
+    add al,30h
+    jmp escribirPuntosEnMem2
+    
+    pasarAdiez2:
+    mov ah,31h
+    mov al,30h
+    jmp escribirPuntosEnMem2
+    
+    pasarAveinte2:
+    call MensajeVictoria
+    mov ah,32h
+    mov al,30h   
+    jmp escribirPuntosEnMem2
+    
+    
+    
+    escribirPuntosEnMem2:  
     mov offset[PuntajeJugador2+0],ah
     mov offset[PuntajeJugador2+1],al
     jmp finalAgregarPuntaje
@@ -593,46 +664,6 @@ CalcularPuntaje endp
 
 
 
-PuntajeACadena proc
-    
-    cmp ax,19
-    ja EscribirVeintePuntos  
-    
-    cmp ax,9
-    ja EscribirDiezPuntos
-    
-    jmp EscribirCeroPuntos 
-    
-    
-    EscribirDiezPuntos:
-    mov ah,31h
-    add al,30h
-    jmp finalDePuntajeaCadena
-    
-    
-    EscribirVeintePuntos:
-    mov ah,32h
-    add al,30h 
-    jmp finalDePuntajeaCadena
-    
-    EscribirCeroPuntos:
-    mov ah,30h
-    add al,30h 
-    jmp finalDePuntajeaCadena
-    
-    
-    
-     
-     
-    finalDePuntajeaCadena: 
-    ret 
-     
-     
- 
-     
-PuntajeACadena endp  
-
-
 ; APARTADO PARA CAMBIAR LOS VALORES DE MEMORIA DE LAS MATRICES DE MAR ORIGINALES
 CambiarValorMatriz proc              
         cmp MueveJugador,0  
@@ -649,5 +680,36 @@ CambiarValorMatriz proc
         FinCambiarValorMatriz:
         ret
 
-CambiarValorMatriz endp    
+CambiarValorMatriz endp
 
+cmp Jugando,1
+jne finalMensajeVictoria
+
+
+MensajeVictoria proc
+mov di,dx
+mov dh, 22   
+mov dl, 0       
+call setCursor	
+mov dx, offset[MensajeVictoriaCadena]  
+mov bh, 0
+mov bl, 03h
+mov ah,9
+int 21h
+
+inc MueveJugador
+add MueveJugador,30h
+mov ah, 09h
+mov al, MueveJugador
+mov bh, 0
+mov cx, 1
+int 10h
+mov dx,di
+call setCursor
+sub Jugando,1
+
+finalMensajeVictoria:   
+ret    
+    
+       
+MensajeVictoria endp
