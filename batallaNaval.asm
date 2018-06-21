@@ -14,7 +14,7 @@ db                  " |____/ \__,_|\__\__,_|_|_|\__,_| |_| \_|\__,_| \_/ \__,_|_
 db                  " ===========================================================" ,  10,13 ,10,13, 10,13 
 
 
-  titulo db " Mar jugador 1 || Mar jugador 2 ", 10,13
+  titulo db "== Jugador 1 ==||== Jugador 2 ==", 10,13
 tablero  db "***************||***************", 10,13
          db "***************||***************", 10,13
          db "***************||***************", 10,13
@@ -288,7 +288,7 @@ DetectarAbajoJug2:
 
 
 
-; DISPARO DEL JUGADOR 1 (ES UNA COMPARACION DE CARAC, QUE DETERMINA EL EXITO O EL FRACASO DEL DISPARO)
+; DISPARO DEL JUGADOR 2 (ES UNA COMPARACION DE CARAC, QUE DETERMINA EL EXITO O EL FRACASO DEL DISPARO)
 DisparoJugador1:
 
         
@@ -333,7 +333,7 @@ DisparoJugador1:
                                       ; direccionamiento indirecto
                                       
                                       
-        mov al, botes_Jug1[di]        ; Realizamos nuestro direccionamiento indirecto y obtenemos el caracter que se
+        mov al, botes_Jug2[di]        ; Realizamos nuestro direccionamiento indirecto y obtenemos el caracter que se
                                       ; en la matriz de mar individual.
                                       
         cmp al, exitoso
@@ -348,7 +348,7 @@ DisparoJugador1:
 
         
         
-; DISPARO DEL JUGADOR 2 (ES UNA COMPARACION DE CARAC, QUE DETERMINA EL EXITO O EL FRACASO DEL DISPARO)        
+; DISPARO DEL JUGADOR 1 (ES UNA COMPARACION DE CARAC, QUE DETERMINA EL EXITO O EL FRACASO DEL DISPARO)        
 DisparoJugador2:
 
 
@@ -371,7 +371,7 @@ DisparoJugador2:
         
         
         MOV di,ax
-        mov al, botes_Jug2[di]
+        mov al, botes_Jug1[di]
         
         cmp al, exitoso
         je SigueMoviendo 
@@ -561,6 +561,7 @@ AgregarPuntaje proc
 AgregarPuntaje endp
 
 
+
 CalcularPuntaje proc
     
 ; Mostrar en el puntaje en el tablero
@@ -586,6 +587,11 @@ int 21h
     
 ret
 CalcularPuntaje endp
+
+
+
+
+
 
 PuntajeACadena proc
     
@@ -630,14 +636,14 @@ PuntajeACadena endp
 ; APARTADO PARA CAMBIAR LOS VALORES DE MEMORIA DE LAS MATRICES DE MAR ORIGINALES
 CambiarValorMatriz proc              
         cmp MueveJugador,0  
-        je  cambiaValorJug1
+        je  cambiaValorJug2
         
-        mov botes_Jug2[di],al
+        mov botes_Jug1[di],al
         jmp FinCambiarValorMatriz
         
         
-        cambiaValorJug1:
-        mov botes_Jug1[di],al
+        cambiaValorJug2:
+        mov botes_Jug2[di],al
         jmp FinCambiarValorMatriz
         
         FinCambiarValorMatriz:
