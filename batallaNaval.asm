@@ -284,27 +284,50 @@ DetectarAbajoJug2:
 ; DISPARO DEL JUGADOR 1 (ES UNA COMPARACION DE CARAC, QUE DETERMINA EL EXITO O EL FRACASO DEL DISPARO)
 DisparoJugador1: 
 
-        mov ax, 0
+        mov ax, 0                     ; AX en cero (lo necesitamos para acumular o tener resultado de 
+                                      ; operaciones matematicas)
+       
+        mov al, 15                    ; En AL agregamos la cantidad de unidades encontradas en una sola fila 
+                                      ; de la matriz de mar individual
         
-        mov al, 15
-        sub dh,9
-        mul dh
-        add dh,9
+        sub dh,9                      ; como vamos a comparar la posicion del cursor en el momento actual con 
+                                      ; respecto a la posicion absoluta en la matriz, quitamos las 9 posiciones
+                                      ; extras que tenemos por culpa del encabezado (el arte + el titulo)
+                                        
+        mul dh                        ; multiplicamos la cantidad de filas que nos desplazamos hacia abajo.
+                                      ; Estamos contando filas usando la posicion. La fila cero es en realidad
+                                      ; la fila actual donde estamos parados porque esta incompleta.
+                                      ; 
+                                      ; De esta forma en AX ahora tenemos la cantidad de elementos de la matriz
+                                      ; que estamos corridos con respecto a la fila actual.
+        
+        add dh,9                      ; Devolvemos el registro del cursor a su posicion original (sumando los 9
+                                      ; requeridos por culpa del encabezado (el arte + el titulo).
        
        
-        mov bl, dl
-        mov bh,0      
-        add ax, bx
+        mov bl, dl                    ; Movemos el valor de la posicion de la columna actual del cursor hacia BL
+        mov bh,0                      ; Ponemos BH en cero.
+                                      ; Hicimos todo lo anterior porque necesitamos sumarle el valor de la posicion
+                                      ; actual del cursor al registro AX. Pero BL, DL son registros de 8bits y AX
+                                      ; es de 16 bits. Con las dos instruccciones anteriores, convertirmos la pos
+                                      ; del cursor en un registro de 16bits
         
-        mov bx,0
+        
+        add ax, bx                    ; Realizamos la suma y ahora si tenemos la cantidad de elementos de la matriz
+                                      ; que estamos corridos con respecto a la fila y columna actual.
+        
+        mov bx,0                      ; No necesitamos mas a BX, asi que lo ponemos en cero. Nuestro valor esta en AX
         
         
-        MOV di,ax
-        mov al, botes_Jug1[di]
+        MOV di,ax                     ; Nuestro valor en AX lo pasamos al registro DI. Porque necesitamos realizar un
+                                      ; direccionamiento indirecto
+                                      
+        mov al, botes_Jug1[di]        ; Realizamos nuestro direccionamiento indirecto y obtenemos el caracter que se
+                                      ; en la matriz de mar individual. 
         
-        cmp al , barquito 
-        je  acertar
-        jmp errar 
+        cmp al , barquito             ; Se compara el caracter obtenido con el que corresponde a un segmento de barco.
+        je  acertar                   ; Si coinciden salta a la subrutina acertar
+        jmp errar                     ; De lo contrario se dirige a la subrutina errar.
 
         
         
