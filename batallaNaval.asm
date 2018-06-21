@@ -30,7 +30,12 @@ puntaje  db "Puntaje:       ||Puntaje:      $", 10,13
 
 exitoso   db 53h  ; Caracteres que representa el exito   "S"
 fracasoso db 4Eh  ; Caracteres que representa el fracaso "N"
-barquito db "#"   ; Caracteres que un fragmento de barco "#"
+barquito db "#"   ; Caracteres que un fragmento de barco "#" 
+
+ComparaPosicion db 0
+MueveJugador db 0
+
+
 
 botes_Jug1 db "**######*******" 
            db "***************" 
@@ -57,8 +62,7 @@ botes_Jug2 db "**##***********"
            db "#******#*******" 
            db "#******#*******" 
 
-ComparaPosicion db 0
-MueveJugador db 0
+
 
 
 
@@ -364,6 +368,7 @@ DisparoJugador2:
 acertar:                ; pintar de amarillo el impacto en el marP
 mov al, exitoso
 mov bl, 1100b
+call CambiarValorMatriz
 call pintarDisparo
 jmp FinDeTurno  
 
@@ -371,6 +376,7 @@ jmp FinDeTurno
 errar:                  ; pintar de rojo el fallido en el mar 
 mov al, fracasoso
 mov bl, 0111b
+call CambiarValorMatriz
 call pintarDisparo
 jmp FinDeTurno       
     
@@ -385,8 +391,23 @@ pintarDisparo endp
 
 
 
+; APARTADO PARA CAMBIAR LOS VALORES DE MEMORIA DE LAS MATRICES DE MAR ORIGINALES
+CambiarValorMatriz proc              
+        cmp MueveJugador,0  
+        je  cambiaValorJug1
+        
+        mov botes_Jug2[di],al
+        jmp FinCambiarValorMatriz
+        
+        
+        cambiaValorJug1:
+        mov botes_Jug1[di],al
+        jmp FinCambiarValorMatriz
+        
+        FinCambiarValorMatriz:
+        ret
 
-   
+CambiarValorMatriz endp    
 
 
 
