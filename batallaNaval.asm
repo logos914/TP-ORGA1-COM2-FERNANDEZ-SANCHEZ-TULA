@@ -26,7 +26,7 @@ tablero  db "***************||***************", 10,13
          db "***************||***************", 10,13
          db "***************||***************", 10,13
          db "***************||***************", 10,13
-puntaje  db "Puntaje:       ||Puntaje:      $", 10,13 
+puntaje  db "Puntaje:00     ||Puntaje:00    $", 10,13 
 
 exitoso   db 53h  ; Caracteres que representa el exito   "S"
 fracasoso db 4Eh  ; Caracteres que representa el fracaso "N"
@@ -34,6 +34,9 @@ barquito db "#"   ; Caracteres que un fragmento de barco "#"
 
 ComparaPosicion db 0
 MueveJugador db 0
+
+PuntajeJugador1 db "00$"
+PuntajeJugador2 db "00$"
 
 
 
@@ -286,7 +289,10 @@ DetectarAbajoJug2:
 
 
 ; DISPARO DEL JUGADOR 1 (ES UNA COMPARACION DE CARAC, QUE DETERMINA EL EXITO O EL FRACASO DEL DISPARO)
-DisparoJugador1: 
+DisparoJugador1:
+
+        
+ 
 
         mov ax, 0                     ; AX en cero (lo necesitamos para acumular o tener resultado de 
                                       ; operaciones matematicas)
@@ -326,8 +332,15 @@ DisparoJugador1:
         MOV di,ax                     ; Nuestro valor en AX lo pasamos al registro DI. Porque necesitamos realizar un
                                       ; direccionamiento indirecto
                                       
+                                      
         mov al, botes_Jug1[di]        ; Realizamos nuestro direccionamiento indirecto y obtenemos el caracter que se
-                                      ; en la matriz de mar individual. 
+                                      ; en la matriz de mar individual.
+                                      
+        cmp al, exitoso
+        je SigueMoviendo 
+        
+        cmp al, fracasoso
+        je SigueMoviendo                               
         
         cmp al , barquito             ; Se compara el caracter obtenido con el que corresponde a un segmento de barco.
         je  acertar                   ; Si coinciden salta a la subrutina acertar
@@ -336,7 +349,10 @@ DisparoJugador1:
         
         
 ; DISPARO DEL JUGADOR 2 (ES UNA COMPARACION DE CARAC, QUE DETERMINA EL EXITO O EL FRACASO DEL DISPARO)        
-DisparoJugador2: 
+DisparoJugador2:
+
+
+
 
         mov ax, 0
         
@@ -357,6 +373,12 @@ DisparoJugador2:
         MOV di,ax
         mov al, botes_Jug2[di]
         
+        cmp al, exitoso
+        je SigueMoviendo 
+        
+        cmp al, fracasoso
+        je SigueMoviendo
+        
         cmp al , barquito 
         je  acertar
         jmp errar
@@ -370,6 +392,7 @@ mov al, exitoso
 mov bl, 1100b
 call CambiarValorMatriz
 call pintarDisparo
+call AgregarPuntaje
 jmp FinDeTurno  
 
 
@@ -390,24 +413,6 @@ ret
 pintarDisparo endp
 
 
-
-; APARTADO PARA CAMBIAR LOS VALORES DE MEMORIA DE LAS MATRICES DE MAR ORIGINALES
-CambiarValorMatriz proc              
-        cmp MueveJugador,0  
-        je  cambiaValorJug1
-        
-        mov botes_Jug2[di],al
-        jmp FinCambiarValorMatriz
-        
-        
-        cambiaValorJug1:
-        mov botes_Jug1[di],al
-        jmp FinCambiarValorMatriz
-        
-        FinCambiarValorMatriz:
-        ret
-
-CambiarValorMatriz endp    
 
 
 
@@ -466,6 +471,7 @@ SigueMoviendo:          ; En el caso de que el movimiento finalizo
 
 
 FinDeTurno:
+    call CalcularPuntaje
     cmp MueveJugador,0     ; En el caso de que el movimiento finalizo
     je  AhoraMueveJugador2 ; y con ello tambien el turno del jugador actual
     jmp AhoraMueveJugador1
@@ -488,3 +494,154 @@ AhoraMueveJugador2:         ;Realiza las acciones para el comienzo del turno del
     call SetCursor
     jmp mueveJug2
     ret
+    
+    
+    
+    
+AgregarPuntaje proc 
+    cmp MueveJugador,0  
+    je  sumarJug1
+    jmp sumarJug2
+    
+   
+    sumarJug1:
+    mov ah,offset[PuntajeJugador1+0]
+    mov al,offset[PuntajeJugador1+1]
+    sub ah,30h     
+    sub al,30h
+    
+    mov dh,ah
+    mov ah,0
+    mov dl,al
+    
+    mov ax,10
+    mul dh
+    mov dh,0
+    add ax,dx
+    inc ax
+    
+    add ah,30h
+    add al,30h
+    
+    mov offset[PuntajeJugador1+0],ah
+    mov offset[PuntajeJugador1+1],al
+    jmp finalAgregarPuntaje
+    
+    
+    
+    sumarJug2:
+    mov ah,offset[PuntajeJugador2+0]
+    mov al,offset[PuntajeJugador2+1]
+    sub ah,30h     
+    sub al,30h
+    
+    mov dh,ah
+    mov ah,0
+    mov dl,al
+    
+    mov ax,10
+    mul dh
+    mov dh,0
+    add ax,dx
+    inc ax
+    
+    add ah,30h
+    add al,30h
+    
+    mov offset[PuntajeJugador2+0],ah
+    mov offset[PuntajeJugador2+1],al
+    jmp finalAgregarPuntaje
+    
+    
+    
+    
+    finalAgregarPuntaje:    
+    ret
+    
+AgregarPuntaje endp
+
+
+CalcularPuntaje proc
+    
+; Mostrar en el puntaje en el tablero
+mov dh, 20   
+mov dl, 8       
+call setCursor	
+mov dx, offset[PuntajeJugador1]  
+mov bh, 0
+mov bl, 03h
+mov ah,9
+int 21h     
+    
+    
+; Mostrar en el puntaje en el tablero
+mov dh, 20   
+mov dl, 25       
+call setCursor	
+mov dx, offset[PuntajeJugador2]  
+mov bh, 0
+mov bl, 03h
+mov ah,9
+int 21h     
+    
+ret
+CalcularPuntaje endp
+
+PuntajeACadena proc
+    
+    cmp ax,19
+    ja EscribirVeintePuntos  
+    
+    cmp ax,9
+    ja EscribirDiezPuntos
+    
+    jmp EscribirCeroPuntos 
+    
+    
+    EscribirDiezPuntos:
+    mov ah,31h
+    add al,30h
+    jmp finalDePuntajeaCadena
+    
+    
+    EscribirVeintePuntos:
+    mov ah,32h
+    add al,30h 
+    jmp finalDePuntajeaCadena
+    
+    EscribirCeroPuntos:
+    mov ah,30h
+    add al,30h 
+    jmp finalDePuntajeaCadena
+    
+    
+    
+     
+     
+    finalDePuntajeaCadena: 
+    ret 
+     
+     
+ 
+     
+PuntajeACadena endp  
+
+
+; APARTADO PARA CAMBIAR LOS VALORES DE MEMORIA DE LAS MATRICES DE MAR ORIGINALES
+CambiarValorMatriz proc              
+        cmp MueveJugador,0  
+        je  cambiaValorJug1
+        
+        mov botes_Jug2[di],al
+        jmp FinCambiarValorMatriz
+        
+        
+        cambiaValorJug1:
+        mov botes_Jug1[di],al
+        jmp FinCambiarValorMatriz
+        
+        FinCambiarValorMatriz:
+        ret
+
+CambiarValorMatriz endp    
+
