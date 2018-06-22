@@ -1,7 +1,3 @@
-
-; Grosero comienzo de este TP
-; 
-
 org 100h 
 jmp inicio  
 
@@ -43,6 +39,15 @@ Jugando db 1
 MueveJugador db 0
 
 
+
+
+
+
+
+
+
+
+
 botes_Jug1 db "**######*******" 
            db "***************" 
            db "****##*********" 
@@ -75,11 +80,25 @@ botes_Jug2 db "**##***********"
 
                                                                 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ; ACA EL PROGRAMA
-
-
-
-
 inicio:
 ; Pintar de cyan usando un carac NULL los espacios que ocuparia el encabezado ASCII   
 mov ah, 09h
@@ -126,6 +145,9 @@ mov dl, 0
 int 10h
 
 
+
+
+
 ;mover cursor al cero para escribir caracteres que necesitamos que sean visibles
 mov dh, 0
 mov dl, 0
@@ -160,6 +182,22 @@ jmp mueveJug1
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ; ESTE LOOP ESCUCHA QUE TECLA PRESIONA EL JUGADOR 1
 mueveJug1:   
         mov ah, 00h
@@ -185,8 +223,7 @@ mueveJug1:
         jmp mueveJug1        ;Sino, no hace nada y vuelve a pedir una tecla  
                     
       
- 
- 
+  
  ; ESTE LOOP ESCUCHA QUE TECLA PRESIONA EL JUGADOR 2   
 
 mueveJug2:   
@@ -210,11 +247,7 @@ mueveJug2:
        
                 
         jmp mueveJug2        ;Sino, no hace nada y vuelve a pedir una tecla  
-                    
-
- 
-
-
+                 
 ; CALCULADORA DE QUE MOVIMIENTOS SON POSIBLE PARA EL JUGADOR1       
 DeteccionDerechaJug1:
         mov ComparaPosicion, dl
@@ -253,6 +286,18 @@ DetectarAbajoJug1:
             
             
             
+
+
+
+
+
+
+
+
+
+
+
+
 ; CALCULA QUE MOVIMIENTOS SON POSIBLE PARA EL JUGADOR2      
 DeteccionDerechaJug2:
         mov ComparaPosicion, dl
@@ -262,6 +307,8 @@ DeteccionDerechaJug2:
         ret            
             
             
+
+
 
 DeteccionIzquierdaJug2:
         mov ComparaPosicion, dl         ; No puede ir a izquierda si ya esta en columna 17
@@ -287,6 +334,16 @@ DetectarAbajoJug2:
         JS MoverAbajo
         jmp mueveJug2
         ret
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -389,6 +446,8 @@ DisparoJugador2:
        
        
 
+
+
 ; APARTADO GRAFICO DEL DISPARO (CAMBIA EL CARAC EN PANTALLA Y SOLICITA EL FINAL DEL TURNO)
 acertar:                ; pintar de amarillo el impacto en el marP
 mov al, exitoso
@@ -423,7 +482,21 @@ pintarDisparo endp
 
 
 
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ; subrutinas  (o loops) que se encargan del absoluto movimiento del cursor
 
@@ -459,6 +532,17 @@ SetCursor proc
         ret
 
 SetCursor endp 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -507,12 +591,18 @@ AhoraMueveJugador2:         ;Realiza las acciones para el comienzo del turno del
     
     
     
+
+
+
+
+
+
+
 AgregarPuntaje proc 
     cmp MueveJugador,0  
     je  sumarJug1
     jmp sumarJug2
-    
-   
+      
     sumarJug1:
     mov ah,offset[PuntajeJugador1+0]
     mov al,offset[PuntajeJugador1+1]
@@ -559,10 +649,7 @@ AgregarPuntaje proc
     mov al,30h
     jmp escribirPuntosEnMem1
     
-    
-    
-    
-    escribirPuntosEnMem1:
+escribirPuntosEnMem1:
     mov offset[PuntajeJugador1+0],ah
     mov offset[PuntajeJugador1+1],al
     jmp finalAgregarPuntaje
@@ -658,9 +745,6 @@ int 21h
     
 ret
 CalcularPuntaje endp
-
-
-
 
 
 
